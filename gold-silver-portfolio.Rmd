@@ -26,6 +26,21 @@ silver <- Quandl("LBMA/SILVER")
 
 gold_current <- gold$`USD (AM)`[1]
 silver_current <- silver$USD[1]
+
+portfolio <- merge(
+  gold,
+  silver,
+  by = "Date",
+  all.x = TRUE,
+  sort = FALSE
+)
+  
+portfolio_value <- data.frame(
+  "gold" = input$gold_oz * portfolio$`USD (AM)`,
+  "silver" = input$silver_oz * portfolio$USD,
+  "date" = gold$Date
+) %>% 
+  gather(key = "source", value = "value", gold, silver)
 ```
 
 
@@ -108,21 +123,6 @@ Value Over Time
 ```{r value-over-time}
 renderPlot({
   if (input$silver_oz == 0 & input$gold_oz == 0) return()
-  portfolio <- merge(
-    gold,
-    silver,
-    by = "Date",
-    all.x = TRUE,
-    sort = FALSE
-  )
-  
-  portfolio_value <- data.frame(
-    "gold" = input$gold_oz * portfolio$`USD (AM)`,
-    "silver" = input$silver_oz * portfolio$USD,
-    "date" = gold$Date
-  ) %>% 
-    gather(key = "source", value = "value", gold, silver)
-  
   if (input$combine) {
     portfolio_value <- portfolio_value %>% 
       group_by(date) %>% 
