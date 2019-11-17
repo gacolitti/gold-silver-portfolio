@@ -1,0 +1,155 @@
+---
+title: "Gold & Silver Portfolio"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(Quandl)
+library(scales)
+library(tidyverse)
+
+shiny::enableBookmarking(store = 'url')
+Quandl.api_key(Sys.getenv('QUANDL_API_KEY'))
+```
+
+```{r global}
+gold <- Quandl("LBMA/GOLD")
+silver <- Quandl("LBMA/SILVER")
+
+gold_current <- gold$`USD (AM)`[1]
+silver_current <- silver$USD[1]
+```
+
+
+Inputs {.sidebar data-width=200}
+-----------------------------------------------------------------------
+
+### 
+
+```{r}
+numericInput(
+  inputId = "gold_oz",
+  label = "Gold (ounces)",
+  value = 0,
+  min = 0
+)
+
+numericInput(
+  inputId = "silver_oz",
+  label = "Silver (ounces)",
+  value = 0, 
+  min = 0
+)
+
+radioButtons(
+  inputId = "combine",
+  label = "Combine Values in Plot", 
+  choices = c("Yes" = TRUE, "No" = FALSE),
+  selected = FALSE
+)
+
+hr()
+
+bookmarkButton(class = "btn-link")
+
+```
+
+Values {data-height=100}
+-----------------------------------------------------------------------
+
+### Total Value
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = dollar(round(input$gold_oz * gold_current + input$silver_oz * silver_current)),
+    icon = "fas fa-coins",
+    caption = "Total Value"
+  )
+})
+```
+
+### Gold Value
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = dollar(round(input$gold_oz * gold_current)),
+    icon = "fas fa-coins",
+    caption = "Gold Value"
+  )
+})
+```
+
+### Silver Value
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = dollar(round(input$silver_oz * silver_current)),
+    icon = "fas fa-coins",
+    caption = "Silver Value"
+  )
+})
+```
+
+Graphs 
+-----------------------------------------------------------------------
+
+### Value Over Time
+
+```{r}
+renderPlot({
+  if (input$silver_oz == 0 & input$gold_oz == 0) return()
+  portfolio <- merge(
+    gold,
+    silver,
+    by = "Date",
+    all.x = TRUE,
+    sort = FALSE
+  )
+  
+  portfolio_value <- data.frame(
+    "gold" = input$gold_oz * portfolio$`USD (AM)`,
+    "silver" = input$silver_oz * portfolio$USD,
+    "date" = gold$Date
+  ) %>% 
+    gather(key = "source", value = "value", gold, silver)
+  
+  if (input$combine) {
+    portfolio_value <- portfolio_value %>% 
+      group_by(date) %>% 
+      summarise(value = sum(value))
+    
+    p <- ggplot(portfolio_value, aes(x = date, y = value))
+  } else {
+    p <- ggplot(portfolio_value, aes(x = date, y = value, color = source)) +
+      scale_color_manual(values = c("gold" = "#f5b342", "silver" = "#C0C0C0"))
+  }
+  
+  p + 
+    geom_line(size = 1) +
+    scale_y_continuous(
+      limits = c(0, NA), 
+      name = "Total Value", 
+      labels = dollar_format()
+    ) +
+    scale_x_date(name = "Date") +
+    theme_minimal() +
+    theme(
+      legend.title = element_blank(),
+      text = element_text(size = 16)
+    )
+})
+```
+
+
+
