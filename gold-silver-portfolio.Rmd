@@ -34,13 +34,6 @@ portfolio <- merge(
   all.x = TRUE,
   sort = FALSE
 )
-  
-portfolio_value <- data.frame(
-  "gold" = input$gold_oz * portfolio$`USD (AM)`,
-  "silver" = input$silver_oz * portfolio$USD,
-  "date" = gold$Date
-) %>% 
-  gather(key = "source", value = "value", gold, silver)
 ```
 
 
@@ -122,12 +115,19 @@ Value Over Time
 
 ```{r value-over-time}
 renderPlot({
+  portfolio_value <- data.frame(
+    "gold" = input$gold_oz * portfolio$`USD (AM)`,
+    "silver" = input$silver_oz * portfolio$USD,
+    "date" = gold$Date
+  ) %>%
+    gather(key = "source", value = "value", gold, silver)
+
   if (input$silver_oz == 0 & input$gold_oz == 0) return()
+  
   if (input$combine) {
     portfolio_value <- portfolio_value %>% 
       group_by(date) %>% 
       summarise(value = sum(value))
-    
     p <- ggplot(portfolio_value, aes(x = date, y = value))
   } else {
     p <- ggplot(portfolio_value, aes(x = date, y = value, color = source)) +
@@ -146,7 +146,7 @@ renderPlot({
     theme(
       legend.title = element_blank(),
       text = element_text(size = 16)
-    )
+    ) 
 })
 ```
 
