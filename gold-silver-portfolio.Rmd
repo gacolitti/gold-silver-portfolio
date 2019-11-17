@@ -9,7 +9,7 @@ output:
     source_code: embed
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 library(flexdashboard)
 library(shiny)
 library(Quandl)
@@ -34,7 +34,7 @@ Inputs {.sidebar data-width=200}
 
 ### 
 
-```{r}
+```{r inputs}
 numericInput(
   inputId = "gold_oz",
   label = "Gold (ounces)",
@@ -59,15 +59,14 @@ radioButtons(
 hr()
 
 bookmarkButton(class = "btn-link")
-
 ```
 
-Values {data-height=100}
+Current Value {data-height=100}
 -----------------------------------------------------------------------
 
 ### Total Value
 
-```{r}
+```{r total-value}
 renderValueBox({
   valueBox(
     value = dollar(round(input$gold_oz * gold_current + input$silver_oz * silver_current)),
@@ -79,7 +78,7 @@ renderValueBox({
 
 ### Gold Value
 
-```{r}
+```{r gold-value}
 renderValueBox({
   valueBox(
     value = dollar(round(input$gold_oz * gold_current)),
@@ -91,7 +90,7 @@ renderValueBox({
 
 ### Silver Value
 
-```{r}
+```{r silver-value}
 renderValueBox({
   valueBox(
     value = dollar(round(input$silver_oz * silver_current)),
@@ -101,12 +100,12 @@ renderValueBox({
 })
 ```
 
-Graphs 
+Value Over Time 
 -----------------------------------------------------------------------
 
 ### Value Over Time
 
-```{r}
+```{r value-over-time}
 renderPlot({
   if (input$silver_oz == 0 & input$gold_oz == 0) return()
   portfolio <- merge(
