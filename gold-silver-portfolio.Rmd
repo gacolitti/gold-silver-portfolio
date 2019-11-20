@@ -115,6 +115,8 @@ Value Over Time
 
 ```{r value-over-time}
 renderPlot({
+  if (input$silver_oz == 0 & input$gold_oz == 0) return()
+  
   portfolio_value <- data.frame(
     "gold" = input$gold_oz * portfolio$`USD (AM)`,
     "silver" = input$silver_oz * portfolio$USD,
@@ -122,8 +124,6 @@ renderPlot({
   ) %>%
     gather(key = "source", value = "value", gold, silver)
 
-  if (input$silver_oz == 0 & input$gold_oz == 0) return()
-  
   if (input$combine) {
     portfolio_value <- portfolio_value %>% 
       group_by(date) %>% 
