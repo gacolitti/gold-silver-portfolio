@@ -17,10 +17,11 @@ library(scales)
 library(tidyverse)
 
 shiny::enableBookmarking(store = 'url')
-Quandl.api_key(Sys.getenv('QUANDL_API_KEY'))
 ```
 
 ```{r global}
+Quandl.api_key(Sys.getenv('QUANDL_API_KEY'))
+
 gold <- Quandl("LBMA/GOLD")
 silver <- Quandl("LBMA/SILVER")
 
