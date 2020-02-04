@@ -1,3 +1,3 @@
-View the app here: https://gacolitti.shinyapps.io/gold-silver-portfolio/
+# gold-silver-portfolio
 
-Related blog post: https://www.giovannicolitti.com/2019/11/16/track-your-portfolio-in-r-with-flexdashboard/
+View the [app]( https://gacolitti.shinyapps.io/gold-silver-portfolio/) or check out my related [blog post](https://www.giovannicolitti.com/2019/11/16/track-your-portfolio-in-r-with-flexdashboard/).
